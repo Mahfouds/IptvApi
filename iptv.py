@@ -100,4 +100,4 @@ def getResult(usernameLogin,passwordLogin,email):
     finally:
         # Close the browser window
         driver.quit()
-app.run()
+app.run(debug=False,host='0.0.0.0')
