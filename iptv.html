@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Other Page</title>
+</head>
+<body>
+    <button id="callApiButton">Call Flask API</button>
+    <div id="responseContainer"></div>
+
+    <script>
+        document.getElementById('callApiButton').addEventListener('click', function() {
+            // Define the API endpoint URL with query parameters for GET request
+            var apiUrl = "http://127.0.0.1:5000/getResult/kemoiptv/00112233";
+
+            // Make the fetch request to the Flask API with GET method
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the API response here
+                    document.getElementById('responseContainer').textContent = JSON.stringify(data);
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        });
+    </script>
+</body>
+</html>
