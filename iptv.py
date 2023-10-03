@@ -14,7 +14,7 @@ CORS(app)
 
 # Initialize the webdriver for Firefox
 def init_driver():
-    driver = webdriver.Firefox()
+    driver = webdriver.Chrome()
     atexit.register(lambda: driver.quit())  # Register a function to quit the driver at exit
     return driver
 
@@ -222,4 +222,8 @@ def before_request():
         g.driver = init_driver()  # Initialize the driver if it doesn't exist in the context
 
 if __name__ == '__main__':
-    app.run(debug=False,host='0.0.0.0')
+    app.run()
+
+
+
+
