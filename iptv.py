@@ -223,7 +223,7 @@ def before_request():
         g.driver = init_driver()  # Initialize the driver if it doesn't exist in the context
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
 
 
 
