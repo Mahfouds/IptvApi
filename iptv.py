@@ -17,7 +17,11 @@ CORS(app)
 def init_driver():
     # options = webdriver.FirefoxOptions()
     # driver = webdriver.Firefox(options=options)
-    driver = webdriver.Chrome(ChromeDriverManager().install())
+    #driver = webdriver.Chrome(ChromeDriverManager().install())
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--disable-gpu')  # Disable GPU acceleration (may be necessary in some cases)
+    driver = webdriver.Chrome(options=chrome_options)
     atexit.register(lambda: driver.quit())  # Register a function to quit the driver at exit
     return driver
 
