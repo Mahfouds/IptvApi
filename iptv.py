@@ -16,19 +16,17 @@ CORS(app)
 
 # Initialize the webdriver for Firefox
 def init_driver():
-    # options = webdriver.FirefoxOptions()
-    # driver = webdriver.Firefox(options=options)
-    #driver = webdriver.Chrome(ChromeDriverManager().install())
-    # chrome_options = webdriver.ChromeOptions()
-    # chrome_options.add_argument('--headless')
-    # chrome_options.add_argument('--disable-gpu')  # Disable GPU acceleration (may be necessary in some cases)
-    # driver = webdriver.Chrome(options=chrome_options)
-    # Set Firefox options for headless mode
-    firefox_options = Options()
-    firefox_options.headless = True
+    # Replace '/path/to/chromedriver.exe' with the actual path to chromedriver.exe on your system
+    chrome_driver_path = 'https://github.com/Mahfouds/chromedriver/chromedriver.exe'
     
-    # Initialize the Firefox webdriver with the options
-    driver = webdriver.Firefox(options=firefox_options)
+    # Set ChromeDriver options (e.g., headless mode)
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--disable-gpu')
+    
+    # Initialize the WebDriver with the specified ChromeDriver path and options
+    driver = webdriver.Chrome(executable_path=chrome_driver_path, options=chrome_options)
+
     atexit.register(lambda: driver.quit())  # Register a function to quit the driver at exit
     return driver
 
