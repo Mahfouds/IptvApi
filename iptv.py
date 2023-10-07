@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, g
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -14,8 +15,9 @@ CORS(app)
 
 # Initialize the webdriver for Firefox
 def init_driver():
-    driver_path = './geckodriver.exe'
-    driver = webdriver.Firefox(executable_path=driver_path)
+    # options = webdriver.FirefoxOptions()
+    # driver = webdriver.Firefox(options=options)
+    driver = webdriver.Chrome(ChromeDriverManager().install())
     atexit.register(lambda: driver.quit())  # Register a function to quit the driver at exit
     return driver
 
