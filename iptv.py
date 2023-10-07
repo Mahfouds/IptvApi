@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, g
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -18,10 +19,16 @@ def init_driver():
     # options = webdriver.FirefoxOptions()
     # driver = webdriver.Firefox(options=options)
     #driver = webdriver.Chrome(ChromeDriverManager().install())
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--disable-gpu')  # Disable GPU acceleration (may be necessary in some cases)
-    driver = webdriver.Chrome(options=chrome_options)
+    # chrome_options = webdriver.ChromeOptions()
+    # chrome_options.add_argument('--headless')
+    # chrome_options.add_argument('--disable-gpu')  # Disable GPU acceleration (may be necessary in some cases)
+    # driver = webdriver.Chrome(options=chrome_options)
+    # Set Firefox options for headless mode
+    firefox_options = Options()
+    firefox_options.headless = True
+    
+    # Initialize the Firefox webdriver with the options
+    driver = webdriver.Firefox(options=firefox_options)
     atexit.register(lambda: driver.quit())  # Register a function to quit the driver at exit
     return driver
 
