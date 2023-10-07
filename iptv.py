@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, g
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.service import Service
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -16,17 +17,12 @@ CORS(app)
 
 # Initialize the webdriver for Firefox
 def init_driver():
-    # Replace '/path/to/chromedriver.exe' with the actual path to chromedriver.exe on your system
-    chrome_driver_path = 'https://github.com/Mahfouds/chromedriver/chromedriver.exe'
-    
-    # Set ChromeDriver options (e.g., headless mode)
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--disable-gpu')
-    
-    # Initialize the WebDriver with the specified ChromeDriver path and options
-    driver = webdriver.Chrome(executable_path=chrome_driver_path, options=chrome_options)
-
+    chrome_options=webdriver.ChromeOptions()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+   
     atexit.register(lambda: driver.quit())  # Register a function to quit the driver at exit
     return driver
 
