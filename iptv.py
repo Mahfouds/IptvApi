@@ -14,8 +14,8 @@ CORS(app)
 
 # Initialize the webdriver for Firefox
 def init_driver():
-    driver_path = './geckodriver.exe'
-    driver = webdriver.Firefox(executable_path=driver_path)
+    options = webdriver.FirefoxOptions()
+    driver = webdriver.Firefox(options=options)
     atexit.register(lambda: driver.quit())  # Register a function to quit the driver at exit
     return driver
 
