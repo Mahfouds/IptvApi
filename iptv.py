@@ -21,7 +21,7 @@ def init_driver():
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()).options=chrome_options)
+    driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
    
     atexit.register(lambda: driver.quit())  # Register a function to quit the driver at exit
     return driver
