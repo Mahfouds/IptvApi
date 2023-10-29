@@ -1,10 +1,13 @@
 from flask import Flask, jsonify, g
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.firefox.options import Options
+#from werkzeug.urls import unquote
 from flask_cors import CORS
 import time
 import atexit
@@ -15,9 +18,14 @@ CORS(app)
 
 # Initialize the webdriver for Firefox
 def init_driver():
-    # options = webdriver.FirefoxOptions()
-    # driver = webdriver.Firefox(options=options)
-    driver = webdriver.Chrome(ChromeDriverManager().install())
+    options = webdriver.FirefoxOptions()
+    driver = webdriver.Firefox(options=options)
+    # #driver = webdriver.Chrome(ChromeDriverManager().install())
+    # chrome_options=webdriver.ChromeOptions()
+    # chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--no-sandbox")
+    # chrome_options.add_argument("--disable-dev-shm-usage")
+    #driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
     atexit.register(lambda: driver.quit())  # Register a function to quit the driver at exit
     return driver
 
