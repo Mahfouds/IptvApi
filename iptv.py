@@ -2,6 +2,7 @@ from flask import Flask, jsonify, g
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.service import Service
+# from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -26,6 +27,8 @@ def init_driver():
     # chrome_options.add_argument("--no-sandbox")
     # chrome_options.add_argument("--disable-dev-shm-usage")
     #driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
+    # driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     atexit.register(lambda: driver.quit())  # Register a function to quit the driver at exit
     return driver
 
