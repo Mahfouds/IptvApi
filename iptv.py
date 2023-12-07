@@ -1,5 +1,6 @@
-from flask import Flask, jsonify, g
+from flask import Flask, jsonify, g,request
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.service import Service
 # from selenium.webdriver.firefox.options import Options
@@ -28,7 +29,7 @@ def init_driver():
     # chrome_options.add_argument("--disable-dev-shm-usage")
     #driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
     # driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    #driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     atexit.register(lambda: driver.quit())  # Register a function to quit the driver at exit
     return driver
 
@@ -147,7 +148,7 @@ def verifyIfImLogin(driver):
         return False
 
 # Function to automate the login
-def automate_login(driver, usernameLogin, passwordLogin):
+def automate_login(driver, usernameLogin, passwordLogin,plan):
     # Check if already logged in
     #if not verifyIfImLogin(driver):
         # Navigate to the website
@@ -171,7 +172,12 @@ def automate_login(driver, usernameLogin, passwordLogin):
         #Navigate to the desired page
     driver.get("http://ky-iptv.com/HckqYJZU/line")
 
-    by_text=select_option_by_text(driver,"package","Paid Trial")
+    #by_text=select_option_by_text(driver,"package","Paid Trial")
+    # if "-" in plan:
+    #     # Replace the hyphen with a space
+    #     plan = plan.replace("-", " ")
+    by_text=select_option_by_text(driver,"package",plan)
+    print(plan)
     time.sleep(10)
 
     if by_text:
@@ -216,16 +222,63 @@ def automate_login(driver, usernameLogin, passwordLogin):
 
 
 # Define a Flask route for automation using GET method
-@app.route('/getResult/<string:usernameLogin>/<string:passwordLogin>', methods=['GET'])
+@app.route('/getResult/<string:usernameLogin>/<string:passwordLogin>', methods=['POST'])
 def getResult(usernameLogin, passwordLogin):
-    #email = request.args.get('email')
     try:
+        # Retrieve data from request payload (JSON)
+        data = request.get_json()
+        plan = data.get('plan')  # Assuming 'text' is the key in your payload
         # Retrieve data from query parameters
         driver = g.driver  # Get the driver from the Flask global context
 
-        link = automate_login(driver, usernameLogin, passwordLogin)
-        result_dict = {"link":link}
-        print(result_dict)
+        link = automate_login(driver, usernameLogin, passwordLogin,plan)
+        result_dict = {"link": link}
+
+        # Clean up and exit the driver
+        cleanup_driver(driver)
+
+        return jsonify(result_dict)
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+# Define a Flask route for automation using GET method
+@app.route('/getResult/<string:usernameLogin>/<string:passwordLogin>/<string:usernameClient>/<string:passwordClient>', methods=['POST'])
+def renew(usernameLogin, passwordLogin,usernameClient,passwordClient):
+    try:
+        driver.get("http://ky-iptv.com/HckqYJZU/lines?order=0&dir=desc")
+        # Input text into the "user_search" input field and press Enter
+        user_search_input = driver.find_element_by_id("user_search")
+        user_search_input.send_keys(usernameClient)  # Replace "Your Text Here" with the desired text
+        user_search_input.send_keys(Keys.RETURN)
+        # Retrieve data from request payload (JSON)
+        data = request.get_json()
+        plan = data.get('plan')  # Assuming 'text' is the key in your payload
+        # Retrieve data from query parameters
+        driver = g.driver  # Get the driver from the Flask global context
+# Locate the last <tr> element within the <tbody> of the <table>
+        last_tr = driver.find_element(By.XPATH, "//table/tbody/tr[1]")
+
+        # Locate the first <td> element within the last <tr>
+        username = last_tr.find_element(By.XPATH, ".//td[2]")
+        password = last_tr.find_element(By.XPATH, ".//td[3]")
+        # Use a CSS selector to locate the button by the onclick attribute
+        button = driver.find_element(By.CSS_SELECTOR, "[onclick*=\"download('"+username.text+"', '"+password.text+"');\"]")
+
+        # Click the button
+        button.click()
+        by_value=select_option_by_value(driver,"download_type","m3u_plus?output=hls")
+        time.sleep(5)
+
+        if by_value:
+            return get_download_url(driver,"download_url")
+
+
+        link = automate_login(driver, usernameLogin, passwordLogin,plan)
+        result_dict = {"link": link}
+
+        # Clean up and exit the driver
+        cleanup_driver(driver)
+
         return jsonify(result_dict)
     except Exception as e:
         return jsonify({"error": str(e)})
@@ -234,6 +287,13 @@ def getResult(usernameLogin, passwordLogin):
 def before_request():
     if 'driver' not in g:
         g.driver = init_driver()  # Initialize the driver if it doesn't exist in the context
+
+# Function to clean up and exit the driver
+def cleanup_driver(driver):
+    try:
+        driver.quit()  # Assuming driver is an instance of a Selenium WebDriver
+    except Exception as e:
+        print(f"Error while cleaning up the driver: {e}")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
