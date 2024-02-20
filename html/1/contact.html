@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #3498db;
+            color: #fff;
+            text-align: center;
+            padding: 1em 0;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .main-content {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .contact-form {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .company-info {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .map img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        footer {
+            background-color: #3498db;
+            color: #fff;
+            text-align: center;
+            padding: 1em 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Contact</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="cours.html">Cours</a></li>
+                <li><a href="instructeurs.html">Instructeurs</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <section class="main-content">
+        <div class="map">
+            <h2>Emplacement sur la Carte</h2>
+            <img src="./img/414aae815fe8937e5f02bf16c4c4e1ac.png" alt="Carte de l'Emplacement">
+        </div>
+        <div class="contact-form">
+            <h2>Formulaire de Contact</h2>
+            <form action="#" method="post">
+                <label for="name">Nom :</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">E-mail :</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="message">Message :</label>
+                <textarea id="message" name="message" rows="4" required></textarea>
+
+                <button type="submit">Envoyer</button>
+            </form>
+             <div class="company-info">
+            <h2>Informations de l'Entreprise</h2>
+            <p>Adresse : 123 Rue de l'Entreprise, Ville, Pays</p>
+            <p>Téléphone : +00 123 456 789</p>
+            <p>Email : info@votreentreprise.com</p>
+            <img src="./img/Sans titresss.jpeg" alt="Image de l'Entreprise">
+        </div>
+        </div>
+
+       
+
+        
+    </section>
+
+    <footer>
+        <p>Contactez-nous : <a href="contact.html">Formulaire de Contact</a></p>
+    </footer>
+</body>
+</html>

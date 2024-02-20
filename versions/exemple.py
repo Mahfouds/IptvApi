@@ -14,9 +14,22 @@ from flask_cors import CORS
 import time
 import atexit
 
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_mail import Mail, Message
+
 app = Flask(__name__)
 app.config["DEBUG"]=True
 CORS(app)
+
+
+# Flask-Mail configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'chdaouiimahfoudd@gmail.com'
+app.config['MAIL_PASSWORD'] = '123456'
+mail = Mail(app)
+
 
 # Initialize the webdriver for Firefox
 def init_driver():
@@ -221,25 +234,47 @@ def automate_login(driver, usernameLogin, passwordLogin,plan):
     
 
 
-# Define a Flask route for automation using GET method
-@app.route('/getResult/<string:usernameLogin>/<string:passwordLogin>', methods=['POST'])
-def getResult(usernameLogin, passwordLogin):
+@app.route('/getResult/', methods=['POST'])
+def getResult():
     try:
-        # Retrieve data from request payload (JSON)
-        data = request.get_json()
-        plan = data.get('plan')  # Assuming 'text' is the key in your payload
-        # Retrieve data from query parameters
-        driver = g.driver  # Get the driver from the Flask global context
+        # Retrieve data from form data
+        usernamePost = request.form.get('username')
+        passwordPost = request.form.get('password')
 
-        link = automate_login(driver, usernameLogin, passwordLogin,plan)
-        result_dict = {"link": link}
+        # Retrieve data from query parameters
+        #driver = g.driver  # Get the driver from the Flask global context
+
+        # Perform your desired actions with usernamePost and passwordPost
+        print(usernamePost, passwordPost)
 
         # Clean up and exit the driver
-        cleanup_driver(driver)
+        # cleanup_driver(driver)
 
-        return jsonify(result_dict)
+        # Return a response if needed
+        return "Data received successfully"
     except Exception as e:
         return jsonify({"error": str(e)})
+
+@app.route('/send_email', methods=['POST'])
+def send_email():
+    try:
+        # Get recipient email address from the form
+        recipient_email = request.form['recipient_email']
+
+        # Create a Message object
+        message = Message('Subject of the email', recipients=[recipient_email])
+
+        # Add the body of the email
+        message.body = 'Hello, this is the body of the email.'
+
+        # Send the email
+        mail.send(message)
+
+        flash('Email sent successfully!', 'success')
+    except Exception as e:
+        flash(f'Error sending email: {str(e)}', 'error')
+
+    return "except"
     
 # Define a Flask route for automation using GET method
 @app.route('/getResult/<string:usernameLogin>/<string:passwordLogin>/<string:usernameClient>/<string:passwordClient>', methods=['POST'])
@@ -296,7 +331,8 @@ def cleanup_driver(driver):
         print(f"Error while cleaning up the driver: {e}")
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    #app.run(#host='0.0.0.0')
+    app.run()
 
 
 

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Other Page</title>
+</head>
+<body>
+    <button id="callApiButton">Call Flask API</button>
+    <div id="responseContainer"></div>
+
+    <script>
+        document.getElementById('callApiButton').addEventListener('click', function() {
+            // Define the API endpoint URL
+            var apiUrl = "http://127.0.0.1:5000/getResult/kemoiptv/00112233";
+    
+            // Define the POST data (including the 'plan' parameter)
+            var postData = {
+                plan: "Paid Trial"
+            };
+    
+            // Make the fetch request to the Flask API with POST method
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                    // You can add more headers if needed (e.g., authorization headers)
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the API response here
+                document.getElementById('responseContainer').textContent = JSON.stringify(data);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        });
+    </script>
+</body>
+</html>
