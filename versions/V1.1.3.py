@@ -189,7 +189,6 @@ def automate_login(driver, usernameLogin, passwordLogin,plan):
         login_button.click()
         time.sleep(5) #10
     except Exception as e:
-        cleanup_driver(driver)
         return jsonify({"error": str(e)})
 
 def setValueOnInputId(id,value,driver):   
@@ -206,51 +205,6 @@ def setValueOnInputId(id,value,driver):
                 input_element.send_keys(value)
         except Exception as e:
             return jsonify({"error": str(e)})
-        
-def changePaypal(driver,merchantId,merchantMail):
-    # URL of the website you want to open and login to
-    website_url = 'https://www.kooneo.com/'
-    username = 'shmahfoud74@gmail.com'
-    password = 'PPpp09@#'
-    # Navigate to the website
-    driver.get(website_url)
-    refuseCookie=driver.find_element(By.XPATH,'/html/body/div[2]/div/div[3]/button[1]')
-    refuseCookie.click()
-    time.sleep(5)
-    seConnecterBtn=driver.find_element(By.XPATH,'/html/body/div/header/div[2]/a[2]')
-    seConnecterBtn.click()
-    usernameInput=driver.find_element(By.ID,'username')
-    usernameInput.clear()
-    usernameInput.send_keys(username)
-    passwordInput=driver.find_element(By.ID,'password')
-    passwordInput.clear()
-    passwordInput.send_keys(password)
-    loginBtn=driver.find_element(By.XPATH,'/html/body/div/main/div/div/div[2]/form/div/div[4]/div[1]/button')
-    loginBtn.click()
-    time.sleep(5)
-    productsTab=driver.find_element(By.XPATH,'//*[@id="koo_btn_product"]')
-    productsTab.click()
-    time.sleep(5)
-    modePaimentBtn=driver.find_element(By.XPATH,'/html/body/div[1]/div[2]/div/ul/li[9]')
-    modePaimentBtn.click()
-    time.sleep(5)
-    managePaypalBtn=driver.find_element(By.XPATH,'/html/body/div[1]/div[2]/main/div[2]/table/tbody/tr[1]/td[3]/div/a[1]')
-    managePaypalBtn.click()
-    time.sleep(5)
-    # merchantId='5DC5PVVW83JJW'
-    # merchantMail='shmahfoud74@gmail.com'
-    time.sleep(5)
-    merchantIdInput=driver.find_element(By.NAME,'idmarchand')
-    merchantIdInput.clear()
-    merchantIdInput.send_keys(merchantId)
-    merchantMailInput=driver.find_element(By.NAME,'idvendeur')
-    merchantMailInput.clear()
-    merchantMailInput.send_keys(merchantMail)
-    time.sleep(5)
-    registerBtn=driver.find_element(By.CSS_SELECTOR,'#form-toolbox-btns button')
-    registerBtn.click()
-    time.sleep(5)
-
 def complete_payment_retourne_credentiels(plan,driver,clientUsername,clientPassword=None):
     try:
     #return
@@ -443,7 +397,7 @@ def complete_payment_retourne_credentiels_renew(plan,driver,clientUsername,clien
                     print(f"Username is {username} and formatted expired date is {formatted_date}")
 
                     time.sleep(5)
-                    # Use a CSS selector to locate the button by the onclick 
+            # Use a CSS selector to locate the button by the onclick 
                         
                     button = driver.find_element(By.XPATH,'//*[@id="datatable-users"]/tbody/tr[1]/td[12]/div/button[2]')
 
@@ -475,9 +429,17 @@ def getResult(usernameLogin, passwordLogin,clientUsername):
             # Optional parameter usernameClient is part of the route, but it's not require
         # Retrieve data from request payload (JSON)
         data = request.get_json()
+        print(f"daat request in get result {data}")
+
         plan = data.get('plan')  # Assuming 'text' is the key in your payload
+        usernameKoneo=data.get('koneo_login')
+        pwdKoneo=data.get('koneo_pwd')
+        merchantId=data.get('merchantId')
+        merchantMail=data.get('merchantMail')
+        print(f"in get resssssult before {usernameKoneo} and {merchantMail} nad {merchantId}")
         # Retrieve data from query parameters
         driver = g.driver  # Get the driver from the Flask global context
+        isPaypalChanged=changePaypal(driver,usernameKoneo,pwdKoneo,merchantId,merchantMail)
         automate_login(driver, usernameLogin, passwordLogin,plan)
 
         #add
@@ -514,74 +476,16 @@ def getResult(usernameLogin, passwordLogin,clientUsername):
             link,expiredDate=complete_payment_retourne_credentiels_renew(plan,driver,clientUsername,myPassword)
             expiredDate = "error" if not expiredDate else expiredDate
         
-            result_dict = {"link": link,"ready":"renew success","expiredDate":expiredDate}
-
-
-        else:
-
-        #end add
-            #automate_login(driver, usernameLogin, passwordLogin,plan)
-            driver.get("http://ky-iptv.com/HckqYJZU/line")
-            link,expiredDate = complete_payment_retourne_credentiels(plan,driver,clientUsername)
-            expiredDate = "error" if not expiredDate else expiredDate
-            result_dict = {"link": link,"ready":"created success","expiredDate":expiredDate}
-            changePaypal(driver,'5DC5PVVW83JJW','shmahfoud74@gmail.com')
-
-
-        # Clean up and exit the driver
-        cleanup_driver(driver)
-
-        return jsonify(result_dict)
-    except Exception as e:
-        return jsonify({"error": "error from generate account function"})
-    
-# Define a Flask route for automation using GET method
-@app.route('/getResult2/<string:usernameLogin>/<string:passwordLogin>/<string:clientUsername>', methods=['POST'])
-def getResult2(usernameLogin, passwordLogin,clientUsername):
-    try:
-            # Optional parameter usernameClient is part of the route, but it's not require
-        # Retrieve data from request payload (JSON)
-        data = request.get_json()
-        plan = data.get('plan')  # Assuming 'text' is the key in your payload
-        # Retrieve data from query parameters
-        driver = g.driver  # Get the driver from the Flask global context
-        automate_login(driver, usernameLogin, passwordLogin,plan)
-
-        #add
-        driver.get("http://ky-iptv.com/HckqYJZU/lines")
-
-        # Find the input element by id
-        input_element = driver.find_element(By.ID, "user_search")
-
-        # Clear the existing value
-        input_element.clear()
-        # Input the value "GZdDjqPrxb"
-        input_element.send_keys(clientUsername)
-
-        # Optionally, you can press the Tab key to move to the next element
-        input_element.send_keys(Keys.TAB)
-        time.sleep(5)
-
-        result_dict=None
-
-        # Locate the last <tr> element within the <tbody> of the <table>
-        last_tr = driver.find_element(By.XPATH, "//table/tbody/tr[1]")
-        if not last_tr.text.strip() == "No data available in table":
-             # Locate the first <td> element within the last <tr>
-            id = last_tr.find_element(By.XPATH, ".//td[1]")
-            username = last_tr.find_element(By.XPATH, ".//td[2]")
-            password = last_tr.find_element(By.XPATH, ".//td[3]")
-            myPassword=password.text
-            print(f"id: {id.text} username : {username.text} and  password : {password.text}")
-            time.sleep(5)
-            driver.get("http://ky-iptv.com/HckqYJZU/line?id="+id.text)
-            print("hello after entre the renew form")
-            time.sleep(15)
-            print("password.txt"+myPassword)
-            link,expiredDate=complete_payment_retourne_credentiels_renew(plan,driver,clientUsername,myPassword)
-            expiredDate = "error" if not expiredDate else expiredDate
-        
-            result_dict = {"link": link,"ready":"renew success","expiredDate":expiredDate}
+            # usernameKoneo=data.get('koneo_login')
+            # pwdKoneo=data.get('koneo_pwd')
+            # merchantId=data.get('merchantId')
+            # merchantMail=data.get('merchantMail')
+            # print(f"in getResult {usernameKoneo} and {merchantMail} nad {merchantId}")
+            # isPaypalChanged=changePaypal(driver,usernameKoneo,pwdKoneo,merchantId,merchantMail)
+            if isPaypalChanged :
+                result_dict = {"link": link,"ready":"creation success","expiredDate":expiredDate}
+            else:
+                result_dict = {"link": link,"ready":"creation success but paypal not change it","expiredDate":expiredDate}
 
 
         else:
@@ -605,10 +509,18 @@ def getResult2(usernameLogin, passwordLogin,clientUsername):
 def renew(usernameLogin, passwordLogin, usernameClient):
     try:
         data = request.get_json()
+        print(f"daat request in renew {data}")
         plan = data.get('plan') 
+        usernameKoneo=data.get('koneo_login')
+        pwdKoneo=data.get('koneo_pwd')
+        merchantId=data.get('merchantId')
+        merchantMail=data.get('merchantMail')
+        print(f"in renew before {usernameKoneo} and {merchantMail} nad {merchantId}")
+
         driver = g.driver
         # website_url = 'http://ky-iptv.com/HckqYJZU/login?referrer=logout'
         # driver.get(website_url)
+        isPaypalChanged=changePaypal(driver,usernameKoneo,pwdKoneo,merchantId,merchantMail)
 
         automate_login(driver, usernameLogin, passwordLogin,plan)
 
@@ -646,8 +558,12 @@ def renew(usernameLogin, passwordLogin, usernameClient):
             link,expiredDate=complete_payment_retourne_credentiels_renew(plan,driver,usernameClient,myPassword)
             expiredDate = "error" if not expiredDate else expiredDate
         
-            result_dict = {"link": link,"ready":"renew success","expiredDate":expiredDate}
-            changePaypal(driver,'5DC5PVVW83JJW','shmahfoud74@gmail.com')
+            print(f"in renew {usernameKoneo} and {merchantMail} nad {merchantId}")
+            # isPaypalChanged=changePaypal(driver,usernameKoneo,pwdKoneo,merchantId,merchantMail)
+            if isPaypalChanged :
+                result_dict = {"link": link,"ready":"renew success","expiredDate":expiredDate}
+            else:
+                result_dict = {"link": link,"ready":"renew success but paypal not change it","expiredDate":expiredDate}
 
                 #link=complete_payment_retourne_credentiels(plan,driver)
                 #result_dict = {"link": link}
@@ -663,81 +579,7 @@ def renew(usernameLogin, passwordLogin, usernameClient):
         else:
             print("there is no result")
             #getResultWithoutRoute(usernameLogin, passwordLogin,usernameClient)
-            result_dict = {"error":"username not found","expiredDate":None}
-
-            # # Clean up and exit the driver
-            # cleanup_driver(driver)
-        # Clean up and exit the driver
-            
-        cleanup_driver(driver)
-        return jsonify(result_dict)
-    except Exception as e:
-        return jsonify({"error": "error from renew function"})
-    
-
-
-# Define a Flask route for automation using GET method
-@app.route('/renew2/<string:usernameLogin>/<string:passwordLogin>/<string:usernameClient>', methods=['POST'])
-def renew2(usernameLogin, passwordLogin, usernameClient):
-    try:
-        data = request.get_json()
-        plan = data.get('plan') 
-        driver = g.driver
-        # website_url = 'http://ky-iptv.com/HckqYJZU/login?referrer=logout'
-        # driver.get(website_url)
-
-        automate_login(driver, usernameLogin, passwordLogin,plan)
-
-        driver.get("http://ky-iptv.com/HckqYJZU/lines")
-
-        # Find the input element by id
-        input_element = driver.find_element(By.ID, "user_search")
-
-        # Clear the existing value
-        input_element.clear()
-        # Input the value "GZdDjqPrxb"
-        input_element.send_keys(usernameClient)
-
-        # Optionally, you can press the Tab key to move to the next element
-        input_element.send_keys(Keys.TAB)
-        time.sleep(5)
-
-        result_dict=None
-
-        # Locate the last <tr> element within the <tbody> of the <table>
-        last_tr = driver.find_element(By.XPATH, "//table/tbody/tr[1]")
-        if not last_tr.text.strip() == "No data available in table":
-
-            # Locate the first <td> element within the last <tr>
-            id = last_tr.find_element(By.XPATH, ".//td[1]")
-            username = last_tr.find_element(By.XPATH, ".//td[2]")
-            password = last_tr.find_element(By.XPATH, ".//td[3]")
-            myPassword=password.text
-            print(f"id: {id.text} username : {username.text} and  password : {password.text}")
-            time.sleep(5)
-            driver.get("http://ky-iptv.com/HckqYJZU/line?id="+id.text)
-            print("hello after entre the renew form")
-            time.sleep(15)
-            print("password.txt"+myPassword)
-            link,expiredDate=complete_payment_retourne_credentiels_renew(plan,driver,usernameClient,myPassword)
-            expiredDate = "error" if not expiredDate else expiredDate
-        
-            result_dict = {"link": link,"ready":"renew success","expiredDate":expiredDate}
-                #link=complete_payment_retourne_credentiels(plan,driver)
-                #result_dict = {"link": link}
-                # print("expired")
-            # else:
-            #     print("not expired")
-            #     result_dict = {"link": "the account not expired","ready":"renew not authorize"}
-            #edit_package(plan,driver)
-            
-
-            # # Clean up and exit the driver
-            # cleanup_driver(driver)  
-        else:
-            print("there is no result")
-            #getResultWithoutRoute(usernameLogin, passwordLogin,usernameClient)
-            result_dict = {"error":"username not found","expiredDate":None}
+            result_dict = {"link": "can't find this user","ready":"renew failed"}
 
             # # Clean up and exit the driver
             # cleanup_driver(driver)
@@ -785,17 +627,107 @@ def getResultWithoutRoute(usernameLogin, passwordLogin,usernameClient):
         return jsonify(result_dict)
     except Exception as e:
         return jsonify({"error": str(e)})
+    
+def changePaypal(driver,username,password,merchantId,merchantMail):
+    try : 
+        # URL of the website you want to open and login to
+        website_url = 'https://www.kooneo.com/'
+        # username = 'shmahfoud74@gmail.com'
+        # password = 'PPpp09@#'
+        # Navigate to the website
+        driver.get(website_url)
+        refuseCookie=driver.find_element(By.XPATH,'/html/body/div[2]/div/div[3]/button[1]')
+        refuseCookie.click()
+        time.sleep(5)
+        seConnecterBtn=driver.find_element(By.XPATH,'/html/body/div/header/div[2]/a[2]')
+        seConnecterBtn.click()
+        usernameInput=driver.find_element(By.ID,'username')
+        usernameInput.clear()
+        usernameInput.send_keys(username)
+        passwordInput=driver.find_element(By.ID,'password')
+        passwordInput.clear()
+        passwordInput.send_keys(password)
+        loginBtn=driver.find_element(By.XPATH,'/html/body/div/main/div/div/div[2]/form/div/div[4]/div[1]/button')
+        loginBtn.click()
+        time.sleep(5)
+        productsTab=driver.find_element(By.XPATH,'//*[@id="koo_btn_product"]')
+        productsTab.click()
+        time.sleep(5)
+        modePaimentBtn=driver.find_element(By.XPATH,'/html/body/div[1]/div[2]/div/ul/li[9]')
+        modePaimentBtn.click()
+        time.sleep(5)
+        current_url = driver.current_url
+        print("Current URL:", current_url)
+        url_parts = current_url.split("/")
+        desired_part = "/".join(url_parts[3:5])  # Join parts 3 and 4 with "/"
+        print("Desired part:", desired_part)
+        driver.get("https://www.kooneo.com/"+desired_part+"/paymode/edit/3")
+        time.sleep(5)
+        # merchantId='5DC5PVVW83JJW'
+        # merchantMail='shmahfoud74@gmail.com'
+        time.sleep(5)
+        merchantIdInput=driver.find_element(By.NAME,'idmarchand')
+        merchantIdInput.clear()
+        merchantIdInput.send_keys(merchantId)
+        merchantMailInput=driver.find_element(By.NAME,'idvendeur')
+        merchantMailInput.clear()
+        merchantMailInput.send_keys(merchantMail)
+        time.sleep(5)
+        registerBtn=driver.find_element(By.CSS_SELECTOR,'#form-toolbox-btns button')
+        registerBtn.click()
+        time.sleep(5)
+        return True
+    except Exception as e:
+        print("An error occurred:", str(e))
+        return False
 
+# @app.before_request
+# def before_request():
+#     print("the driver is open : "+str(is_firefox_open()))
+#     #if 'driver' not in g and request.method == 'POST':
+#     if 'driver' not in g :
+#         #if not is_firefox_open():
+#             g.driver = init_driver()  # Initialize the driver if it doesn't exist in the context
+#         #else:
+#             return None
+    
+
+
+from threading import Lock
+
+lock = Lock()
+processed_requests = set()
 
 @app.before_request
 def before_request():
-    print("the driver is open : "+str(is_firefox_open()))
-    #if 'driver' not in g and request.method == 'POST':
-    if 'driver' not in g :
-        #if not is_firefox_open():
+    global processed_requests
+    current_params = (request.method, request.path, request.args)  # Capture current request parameters
+    
+    if not lock.locked():  # Check if the lock is not acquired
+        lock.acquire()  # Acquire the lock
+        print("the driver is open : " + str(is_firefox_open()))
+        
+        # Check if the current parameters match any of the processed requests
+        if current_params in processed_requests:
+            lock.release()  # Release the lock
+            return "Duplicate request. Skipping processing.", 409
+        
+        if 'driver' not in g:
             g.driver = init_driver()  # Initialize the driver if it doesn't exist in the context
-        #else:
-            return None
+        
+        processed_requests.add(current_params)  # Add current request parameters to processed requests
+        lock.release()  # Release the lock
+    else:
+        # Do something here to handle the case where a request is already running
+        return "Another request is already in progress. Please try again later.", 409
+
+@app.after_request
+def after_request(response):
+    # Remove current request parameters from processed requests after responding to the request
+    current_params = (request.method, request.path, request.args)
+    processed_requests.discard(current_params)
+    return response
+        
 # if __name__ == '__main__':
 #     # Use Waitress to serve the Flask app
 #     waitress.serve(app, host='0.0.0.0', port=5000)
